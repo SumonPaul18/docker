@@ -1,0 +1,13 @@
+
+#How to Connect Jenkins to Github
+
+#Set Up Webhooks in GitHub
+
+In your GitHub repository, 
+go to "Settings" > "Webhooks" > "Add webhook." 
+Enter the Jenkins webhook URL (usually in the format http://jenkins-server/github-webhook/)
+
+http://192.168.0.89:8080/github-webhook/
+
+and select the events that should trigger the webhook (e.g., push events).
+

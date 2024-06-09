@@ -1,0 +1,27 @@
+version: '3.3'
+services:
+  apache:
+    image: httpd:latest
+    container_name: myapache
+    ports:
+    - '8082:80'
+    volumes:
+    - ./website:/usr/local/apache2/htdocs
+    restart: unless-stopped
+    labels:
+    - "traefik.http.routers.apache.rule=Host(`blog.paulco.xyz`)"
+    depends_on:
+    - traefik
+    
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    command: --api.insecure=true --providers.docker
+    ports:
+    - 81:80
+    - 8282:8080
+    restart: unless-stopped
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+    - "traefik.http.routers.traefik.rule=Host(`traefik.paulco.xyz`)"
