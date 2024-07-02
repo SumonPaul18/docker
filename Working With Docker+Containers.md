@@ -1,36 +1,34 @@
-+++++++++++++++++++++++++++++++++
-+ Working With Docker Containers +
-+++++++++++++++++++++++++++++++++
-
-#Get detailed information about docker:
-
-docker info
-
-#Docker version
-
-docker --version
-
-#Search for Docker Images:
-#[ubuntu] is a image name, here as our needed image.
-
-docker search ubuntu    
-
-#Pull a Docker Image:
-#download the official Ubuntu image by running
-
-docker pull ubuntu
-
-#View Downloaded Images:
-
-docker images
-
-#Run a Docker Container with non-interactive mode:
-#[ubuntu] is our downloaded image. if haven't download previously, then would download image when run this command.
-
-docker run ubuntu    
-
-#Run a Docker Container with a container name and non-interactive mode.
-# docker run --name [container-name] [image-name]
+#
+## Working With Docker Containers
+#
+Get detailed information about docker:
+####
+    docker info
+####
+Docker version
+####
+    docker --version
+Search for Docker Images:<br>
+[ubuntu] is a image name, here as our needed image.
+####
+    docker search ubuntu    
+####
+Pull a Docker Image: <br>
+Download the official Ubuntu image by running
+####
+    docker pull ubuntu
+####
+View Downloaded Images:
+####
+    docker images
+####
+Run a Docker Container with non-interactive mode: <br>
+[ubuntu] is our downloaded image. if haven't download previously, then would download image when run this command.
+####
+    docker run ubuntu    
+####
+Run a Docker Container with a container name and non-interactive mode. <br>
+docker run --name [container-name] [image-name]
 
 docker run --name myubuntu ubuntu
 
