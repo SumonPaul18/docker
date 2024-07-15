@@ -29,5 +29,5 @@ docker compose down with a non-default yml file name
 How to add hosts in /etc/hosts files
     
     extra_hosts:
-   - "somehost:162.242.195.82"
-   - "otherhost:50.31.209.229"
+       - "somehost:162.242.195.82"
+       - "otherhost:50.31.209.229"
