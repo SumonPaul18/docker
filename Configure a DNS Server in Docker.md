@@ -157,9 +157,9 @@ Solution:
     
 Find bellow line:
 
-DNSStubListener=yes
+#DNSStubListener=yes
 
-#Uncomment and no:
+Uncomment and no:
 ####
     DNSStubListener=no
 
@@ -177,27 +177,26 @@ docker run -d --rm --name=mail --net=labnet --ip=172.24.0.3 --dns=172.24.0.2 cen
 ####
     docker run -dit --name zimbra --net=labnet --ip=172.24.0.3 --dns=172.24.0.2 -h mail.paulco.xyz --add-host=mail.paulco.xyz:172.24.0.3 -p 80:80 -p 8080:8080 -p 443:443 -p 25:25 -p 465:465 -p 587:587 -p 993:993 -p 995:995 -p 7071:7071 -p 8443:8443 -p 7143:7143 -p 7110:7110 zimbramail
 
-#Execute the myzimbra container
-docker exec -it zimbra /bin/bash
+Execute the myzimbra container
 
+    docker exec -it zimbra /bin/bash
 
+Run a container for web Server under Existing DNS server:
 
-#Run a container for web Server under Existing DNS server:
+    docker run -d --rm --name=web --net=labnet --ip=172.24.0.4 --dns=172.24.0.2 httpd:latest
 
-docker run -d --rm --name=web --net=labnet --ip=172.24.0.4 --dns=172.24.0.2 httpd:latest
+As you can see, all containers now run on the same network.
 
-#As you can see, all containers now run on the same network.
+    docker network inspect labnet
 
-docker network inspect labnet
+Check dns client container
 
-#check dns client container
-
-docker exec -it mail nslookup mail.paulco.xyz 
-
-Server:         127.0.0.11
-Address:        127.0.0.11:53
-
-Name:   mail.paulco.xyz
-Address: 172.24.0.4
+    docker exec -it mail nslookup mail.paulco.xyz 
+####
+< Server:         127.0.0.11
+< Address:        127.0.0.11:53
+<
+< Name:   mail.paulco.xyz
+< Address: 172.24.0.4
 
 
