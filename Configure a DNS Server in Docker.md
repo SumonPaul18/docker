@@ -196,11 +196,9 @@ Check dns client container
 Output Like That:
 
 > Server:         127.0.0.11
-
 > Address:        127.0.0.11:53
-
+>
 > Name:   mail.paulco.xyz
-
 > Address: 172.24.0.4
 
 
