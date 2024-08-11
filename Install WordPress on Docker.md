@@ -59,92 +59,98 @@ Create a new docker-compose.yml file, and paste the contents below:
     volumes:
       mysql: {}
   
-  
-#Docker Compose UP
-docker compose up -d
+Docker Compose UP
 
-#Check Docker Compose
-docker compose ps
+    docker compose up -d
 
-#Open Browser
-#http://yourip:8000
+Check Docker Compose
+    
+    docker compose ps
 
-192.168.0.107:8000
+Open Browser
 
-#1st time setup the wordpress site:
+    http://dockerhost:8000
 
-Site Title:
-User:
-Pass:
-Email:
+1st time setup the wordpress site:
 
+> Site Title:
+> User:
+> Pass:
+> Email:
 
-#Now Enjoying! Your Wordpress Site.
+Now Enjoying! Your Wordpress Site.
 
-#Check docker compose
-docker compose ps
+Check docker compose
 
-#Check docker PS
-docker ps
+    docker compose ps
 
-#Down docker compose
-docker compose down
+Check docker PS
+    
+    docker ps
 
-#Setting up Wordpress with phpMyAdmin
+Down docker compose
 
-version: "3"
-services:
-  db:
-    image: mysql:5.7
+    docker compose down
+
+Setting up Wordpress with phpMyAdmin
+####
+    version: "3"
+    services:
+      db:
+        image: mysql:5.7
+        volumes:
+          - mysql_data:/var/lib/mysql
+        restart: always
+        environment:
+          MYSQL_ROOT_PASSWORD: centos@123
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: sysadmin
+          MYSQL_PASSWORD: centos@123
+        volumes:
+          -  ./mysql:/var/lib/mysql
+          
+      phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        depends_on:
+          - db
+        restart: always
+        environment:
+          PMA_HOST: db
+          PMA_USER: sysadmin
+          PMA_PASSWORD: centos@123
+        ports:
+          - "8080:80"
+          
+       wordpress:
+        depends_on:
+          - db
+        image: wordpress:latest
+        restart: always
+        ports:
+          - "8000:80"
+        environment:
+          WORDPRESS_DB_HOST: db:3306
+          WORDPRESS_DB_USER: sysadmin
+          WORDPRESS_DB_PASSWORD: centos@123
+          WORDPRESS_DB_NAME: wordpress
+          
+        volumes:
+          ["./wordpress:/var/www/html"]
     volumes:
-      - mysql_data:/var/lib/mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: centos@123
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: sysadmin
-      MYSQL_PASSWORD: centos@123
-    volumes:
-      -  ./mysql:/var/lib/mysql
-      
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    depends_on:
-      - db
-    restart: always
-    environment:
-      PMA_HOST: db
-      PMA_USER: sysadmin
-      PMA_PASSWORD: centos@123
-    ports:
-      - "8080:80"
-      
-   wordpress:
-    depends_on:
-      - db
-    image: wordpress:latest
-    restart: always
-    ports:
-      - "8000:80"
-    environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: sysadmin
-      WORDPRESS_DB_PASSWORD: centos@123
-      WORDPRESS_DB_NAME: wordpress
-      
-    volumes:
-      ["./wordpress:/var/www/html"]
-volumes:
-  mysql_data:
+      mysql_data:
   
   
-#Docker Compose UP
-docker compose up -d  
+Docker Compose UP
+
+    docker compose up -d  
   
 
-#Access phpMyAdmin interface:
-http://localhost:8080/
+Access phpMyAdmin interface:
 
-#Access wordpress interface:
-192.168.0.107:8000
+    http://localhost:8080/
 
+Access wordpress interface:
+
+    192.168.0.107:8000
+
+#
