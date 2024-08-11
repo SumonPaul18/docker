@@ -6,22 +6,23 @@ To follow along with this blog, you'll need the following:
 - 1. Linux System with Docker Pre-Installed
 - 2. Docker-Compose
 
-#Setup Docker Network
-#Let's create a docker network.
+Setup Docker Network
 
-docker network create labnet --subnet 172.24.0.0/16
+Let's create a docker network.
+####
+    docker network create labnet --subnet 172.24.0.0/16
 
+For our network, we're using a /16 subnet.
 
-#For our network, we're using a /16 subnet.
+DNS Server Configuration
 
-#DNS Server Configuration
-#1. First, setup a directory to store our BIND 9 configuration and create a new file called named.conf.options to start configuring the BIND 9 server.
+1. First, setup a directory to store our BIND 9 configuration and create a new file called named.conf.options to start configuring the BIND 9 server.
 
-mkdir -p /opt/bind9/configuration
+    mkdir -p /opt/bind9/configuration
 
-nano /opt/bind9/configuration/named.conf.options
+    nano /opt/bind9/configuration/named.conf.options
 
-#2. Copy the contents below into the file.
+2. Copy the contents below into the file.
 
 options {    
 directory "/var/cache/bind";    
