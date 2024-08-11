@@ -6,11 +6,11 @@ Refference:https://www.linkedin.com/pulse/ssh-docker-container-centos-yashwanth-
 
 docker run -dit --name (container_name) --privileged centos /usr/sbin/init
 
-Error:
+<b>Error:</b>
 
 Failed to get D-Bus connection: Operation not permitted
 
-solution:
+<b>Solution:</b>
 
 Run the container in privileged mode.
 
