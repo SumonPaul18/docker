@@ -10,7 +10,7 @@ Setup Docker Network
 
 Let's create a docker network.
 ####
-    docker network create labnet --subnet 172.24.0.0/16
+    docker network create dnsnet --subnet 172.24.0.0/16
 
 For our network, we're using a /16 subnet.
 
