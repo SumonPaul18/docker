@@ -1,7 +1,5 @@
 # Create & Configure a DNS Server in Docker
 
-### Let's get into it!
-
 #### Pre-Requisites
 To follow along with this blog, you'll need the following:
 
