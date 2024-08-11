@@ -115,7 +115,7 @@ Run the Docker Container
 
 Once our container has been successfully built, we will now run it in our lab-net network with an explicitly mentioned IP address.
 ####
-    docker run -d -h=ns1.paulco.xyz --add-host=ns1.paulco.xyz:172.24.0.2 -p 53:53/tcp -p 53:53/udp -p 127.0.0.1:953:953/tcp --rm --name=dnsserver --net=labnet --ip=172.24.0.2 mydns
+    docker run -d -h=ns1.paulco.xyz --add-host=ns1.paulco.xyz:172.24.0.2 -p 53:53/tcp -p 53:53/udp -p 127.0.0.1:953:953/tcp --rm --name=dnsserver --net=dnsnet --ip=172.24.0.2 mydns
 
 Then enable the bind9 daemon:
 
@@ -173,7 +173,7 @@ We can now use the previously started DNS container as our DNS server. Any servi
 
 Run a container for Mail Server under Existing DNS server:
 
-docker run -d --rm --name=mail --net=labnet --ip=172.24.0.3 --dns=172.24.0.2 centos
+docker run -d --rm --name=mail --net=dnsnet --ip=172.24.0.3 --dns=172.24.0.2 centos
 ####
     docker run -dit --name zimbra --net=dnsnet --ip=172.24.0.3 --dns=172.24.0.2 -h mail.paulco.xyz --add-host=mail.paulco.xyz:172.24.0.3 -p 80:80 -p 8080:8080 -p 443:443 -p 25:25 -p 465:465 -p 587:587 -p 993:993 -p 995:995 -p 7071:7071 -p 8443:8443 -p 7143:7143 -p 7110:7110 zimbramail
 
