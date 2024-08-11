@@ -1,11 +1,9 @@
 
-How to Install and Uninstall Docker on CentOS
+# How to Install Docker on CentOS
 
-#Install Docker Engine on CentOS
-
-#Set up the repository:
-sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+Set up the repository:
+    sudo yum install -y yum-utils
+    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
 #Install Docker Engine
 #Install Docker Engine, containerd, and Docker Compose:
