@@ -1,14 +1,8 @@
-+++++++++++++++++++++++++++++++
-+ Install Wordpress On Docker +
-+++++++++++++++++++++++++++++++
+# Install Wordpress On Docker
 
-++++++++++++++
-+ Reference: +
-++++++++++++++
+Reference:
 1. https://www.linkedin.com/pulse/how-install-wordpress-docker-using-compose-deepesh-waiba/
 2. https://www.youtube.com/watch?v=pT08xKClJP0
-
-+++++++
 
 #Verify docker compose version
 docker compose version
