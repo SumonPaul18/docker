@@ -4,57 +4,60 @@ Reference:
 1. https://www.linkedin.com/pulse/how-install-wordpress-docker-using-compose-deepesh-waiba/
 2. https://www.youtube.com/watch?v=pT08xKClJP0
 
-#Verify docker compose version
-docker compose version
+Verify docker compose version
 
-#Create a new project directory:
-mkdir wordpress
+    docker compose version
 
-#Navigate to the new directory:
-cd wordpress
+Create a new project directory:
+    
+    mkdir wordpress
 
-#Create a yaml file.
+Navigate to the new directory:
+    
+    cd wordpress
 
-nano docker-compose.yml
+Create a yaml file.
 
-#Create a new docker-compose.yml file, and paste the contents below:
+    nano docker-compose.yml
 
-# Defines which compose version to use
-version: "20" 
-
-# Services line define which Docker images to run. In this case, it will be MySQL server and WordPress image.
-services:
-  
-  #db is a service name.
-  db:
-    # image: here you define your image with tag.  
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: centos@123
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: sysadmin
-      MYSQL_PASSWORD: centos@123
-      # Previous four lines define the main variables needed for the MySQL container to work: database, database username, database user password, and the MySQL root password.
-  wordpress:
-    depends_on:
-      - db
-    image: wordpress:latest
-    restart: always
-    # Restart line controls the restart mode, meaning if the container stops running for any reason, it will restart the process immediately.
-    ports:
-      - "8000:80"
-      # The previous line defines the port that the WordPress container will use. After successful installation, the full path will look like this: http://localhost:8000
-    environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: sysadmin
-      WORDPRESS_DB_PASSWORD: centos@123
-      WORDPRESS_DB_NAME: wordpress
-# Similar to MySQL image variables, the last four lines define the main variables needed for the WordPress container to work properly with the MySQL container.
+Create a new docker-compose.yml file, and paste the contents below:
+####
+    # Defines which compose version to use
+    version: "20" 
+    
+    # Services line define which Docker images to run. In this case, it will be MySQL server and WordPress image.
+    services:
+      
+      #db is a service name.
+      db:
+        # image: here you define your image with tag.  
+        image: mysql:5.7
+        restart: always
+        environment:
+          MYSQL_ROOT_PASSWORD: centos@123
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: sysadmin
+          MYSQL_PASSWORD: centos@123
+          # Previous four lines define the main variables needed for the MySQL container to work: database, database username, database user password, and the MySQL root password.
+      wordpress:
+        depends_on:
+          - db
+        image: wordpress:latest
+        restart: always
+        # Restart line controls the restart mode, meaning if the container stops running for any reason, it will restart the process immediately.
+        ports:
+          - "8000:80"
+          # The previous line defines the port that the WordPress container will use. After successful installation, the full path will look like this: http://localhost:8000
+        environment:
+          WORDPRESS_DB_HOST: db:3306
+          WORDPRESS_DB_USER: sysadmin
+          WORDPRESS_DB_PASSWORD: centos@123
+          WORDPRESS_DB_NAME: wordpress
+    # Similar to MySQL image variables, the last four lines define the main variables needed for the WordPress container to work properly with the MySQL container.
+        volumes:
+          ["./:/var/www/html"]
     volumes:
-      ["./:/var/www/html"]
-volumes:
-  mysql: {}
+      mysql: {}
   
   
 #Docker Compose UP
