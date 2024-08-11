@@ -1,7 +1,9 @@
+# Create & Configure a DNS Server in Docker
+
 ### Let's get into it!
 
-### Pre-Requisites
-### To follow along with this blog, you'll need the following:
+#### Pre-Requisites
+To follow along with this blog, you'll need the following:
 
 - 1. Linux System with Docker Pre-Installed
 - 2. Docker-Compose
