@@ -9,7 +9,7 @@ Docker version
 ####
     docker --version
 Search for Docker Images:<br>
-[ubuntu] is a image name, here as our needed image.
+[ubuntu] is a image name, here as our needed image
 ####
     docker search ubuntu    
 ####
@@ -27,113 +27,114 @@ Run a Docker Container with non-interactive mode: <br>
 ####
     docker run ubuntu    
 ####
-Run a Docker Container with a container name and non-interactive mode. <br>
+Run a Docker Container with a container name and non-interactive mode <br>
 docker run --name [container-name] [image-name]
 
-docker run --name myubuntu ubuntu
+    docker run --name myubuntu ubuntu
 
-#Run a Docker Container with interactive shell access.
-#[ubuntu] is a image name and -it is interactive mode.
+Run a Docker Container with interactive shell access
 
-docker run -it ubuntu
+[ubuntu] is a image name and -it is interactive mode
 
-#NOTE:Back from Container Terminal to Host Terminal with stoping the Container. 
+    docker run -it ubuntu
 
-exit
+NOTE:Back from Container Terminal to Host Terminal with stoping the Container
 
-#NOTE:Back from Container Terminal to Host Terminal without stoping the Container. 
+    exit
 
-ctrl+p+q
+NOTE:Back from Container Terminal to Host Terminal without stoping the Container
 
-#Run Ubuntu Container with tag
-#[:latest is a images tag, we are run specefic images verify with tag.
-#tag means: latest, version, or identified by a images. 
+    ctrl+p+q
 
-docker run –it ubuntu:latest /bin/bash 
+Run Ubuntu Container with tag
+
+[:latest is a images tag, we are run specefic images verify with tag
+
+tag means: latest, version, or identified by a images. 
+
+    docker run –it ubuntu:latest /bin/bash 
+
+Container running in the background with bash shell.
+
+Here -i for interactive mode, -t for terminal, -d for daemon mode, bash for bash shell mode
+
+    docker run -it -d ubuntu bash
+
+Enter a Container to Access Bash Shell in Terminal.
+
+Here, using exec for execution to container, /bin/bash for terminal mode.
+
+    docker exec -it ubuntu /bin/bash
+
+Enter a Container to Access Shell in Terminal.
+
+docker exec -it container-name sh
+
+sh for shell terminal
+
+    docker exec -it ubuntu sh
+
+# Run Nginx container for web server
+
+-p for port, My local machine port 8000  maping to with nginx container port 80.   
+
+    docker run -it -d -p 8000:80 nginx
+
+Run a webserver using nginx container with bridge network & mapping port
+
+Access the webserver local Machine ip: http://192.168.106.110:8080/
+
+    docker run -dit --name webserver1 --network bridge -p 8080:80 nginx
+
+Run nginx container with Host Volume & Nginx Defaulf Configuration 
+
+    docker run --name docker-nginx -p 80:80 -v ~/docker-nginx/html:/usr/share/nginx/html -v ~/docker-nginx/default.conf:/etc/nginx/conf.d/default.conf -d nginx
 
 
-#Container running in the background with bash shell.
-#Here -i for interactive mode, -t for terminal, -d for daemon mode, bash for bash shell mode. 
+# Add Hostname on a Container
 
-docker run -it -d ubuntu bash
+-h for hostname 
 
-#Enter a Container to Access Bash Shell in Terminal.
-#Here, using exec for execution to container, /bin/bash for terminal mode.
+    docker run -dit --name ubuntu-nginx -h mail ubuntu
 
-docker exec -it ubuntu /bin/bash
+How to Add Hosts file on Container
 
-#Enter a Container to Access Shell in Terminal.
-#docker exec -it container-name sh
-#sh for shell terminal
+    docker run --add-host=mail.paulco.xyz:172.17.0.4 -it ubuntu /bin/bash
 
-docker exec -it ubuntu sh
+Adding Multiple Entries in Hosts file on a container
 
-+++++++++++++++++++++++++++++++++++++++
-+ Run Nginx container for web server  +
-+++++++++++++++++++++++++++++++++++++++
+    docker run --add-host=1.example.com:10.0.0.1 --add-host=2.example2.com:10.0.0.2 --add-host=3.example.com:10.0.0.3 ubuntu cat /etc/hosts
 
-# -p for port, My local machine port 8000  maping to with nginx container port 80.   
+Add Hostname & hosts file with port on a Container 
 
-docker run -it -d -p 8000:80 nginx
+    docker run -dit --name ubuntu-nginx -h mail --add-host=mail.paulco.xyz:172.17.0.3 -p 81:81 ubuntu
 
-#Run a webserver using nginx container with bridge network & mapping port. 
-#Access the webserver local Machine ip: http://192.168.106.110:8080/
+# Execute Command from outside of Container
 
-docker run -dit --name webserver1 --network bridge -p 8080:80 nginx
+Run a Linux command on a container immediately, without entering the container.
 
-+++++++++++++++++++++++++++++++++
+docker exec webserver bash -c "linux command"
 
-+++++++++++++++++++++++++++++++++
-+ Add Hostname on a Container   +
-+++++++++++++++++++++++++++++++++
+    docker exec -it 39361978fd68 bash -c df -h
+#### 
+    docker exec -it 39361978fd68 bash -c "cat /etc/lsb-release"
 
-# -h for hostname 
 
-docker run -dit --name ubuntu-nginx -h mail ubuntu
+# Push Command, when use docker run
 
-#How to Add Hosts file on Container
+    docker run ubuntu bash -c "apt-get -y update" 
 
-docker run --add-host=mail.paulco.xyz:172.17.0.4 -it ubuntu /bin/bash
+    docker run ubuntu bash -c "apt-get -y install nginx" 
 
-#Adding Multiple Entries in Hosts file on a container
+Automatically remove the Ubuntu container, when we stop the container.
 
-docker run --add-host=1.example.com:10.0.0.1 --add-host=2.example2.com:10.0.0.2 --add-host=3.example.com:10.0.0.3 ubuntu cat /etc/hosts
+the --rm flag instructs Docker to automatically remove the Ubuntu Docker container after we stop it.
 
-#Add Hostname & hosts file with port on a Container 
+    docker run -it --rm ubuntu /bin/bash
 
-docker run -dit --name ubuntu-nginx -h mail --add-host=mail.paulco.xyz:172.17.0.3 -p 81:81 ubuntu
 
-+++++++++++++++++++++++++++++++++
+# Save a Configured Container
 
-+++++++++++++++++++++++++++++++++++++++++++++
-+ Execute Command from outside of Container +
-+++++++++++++++++++++++++++++++++++++++++++++
-
-#Run a Linux command on a container immediately, without entering the container.
-#docker exec webserver bash -c "linux command"
-
-docker exec -it 39361978fd68 bash -c df -h
- 
-docker exec -it 39361978fd68 bash -c "cat /etc/lsb-release"
-
-++++++++++++++++++++++++++++++++
-
-+++++++++++++++++++++++++++++++++++++
-+ Push Command, when use docker run +
-+++++++++++++++++++++++++++++++++++++
-
-docker run ubuntu bash -c "apt-get -y update" 
-
-docker run ubuntu bash -c "apt-get -y install nginx" 
-
-#Automatically remove the Ubuntu container, when we stop the container.
-#the --rm flag instructs Docker to automatically remove the Ubuntu Docker container after we stop it.
-
-docker run -it --rm ubuntu /bin/bash
-
-+++++++++++++++++++++++++++++++++
-+ Save a Configured Container   +
-+++++++++++++++++++++++++++++++++
 
 #1st run a container then configure as your required and stop the container.
 #web1 is old container and web2 is new container which save from web1.
