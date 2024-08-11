@@ -3,8 +3,8 @@
 #### Pre-Requisites
 To follow along with this blog, you'll need the following:
 
-- 1. Linux System with Docker Pre-Installed
-- 2. Docker-Compose
+1. Linux System with Docker Pre-Installed
+2. Docker-Compose
 
 Setup Docker Network
 
@@ -193,7 +193,7 @@ Check dns client container
 
     docker exec -it mail nslookup mail.paulco.xyz 
 ####
-< Server:         127.0.0.11
+> Server:         127.0.0.11
 < Address:        127.0.0.11:53
 <
 < Name:   mail.paulco.xyz
