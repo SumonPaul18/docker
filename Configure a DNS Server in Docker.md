@@ -192,11 +192,13 @@ As you can see, all containers now run on the same network.
 Check dns client container
 
     docker exec -it mail nslookup mail.paulco.xyz 
-####
+
+Output Like That:
+
 > Server:         127.0.0.11
-< Address:        127.0.0.11:53
-<
-< Name:   mail.paulco.xyz
-< Address: 172.24.0.4
+> Address:        127.0.0.11:53
+>
+> Name:   mail.paulco.xyz
+> Address: 172.24.0.4
 
 
