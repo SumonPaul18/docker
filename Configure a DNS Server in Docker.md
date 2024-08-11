@@ -195,10 +195,10 @@ Check dns client container
 
 Output Like That:
 
-> Server:         127.0.0.11
+> Server:         127.0.0.11 <br>
 > Address:        127.0.0.11:53
->
-> Name:   mail.paulco.xyz
+> <br>
+> Name:   mail.paulco.xyz <br>
 > Address: 172.24.0.4
 
 
