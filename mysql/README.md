@@ -22,3 +22,19 @@ docker exec -it
 http://docker-host-ip:phpadmin-port
 ```
 input your defined user & password
+
+---
+### Resetting MySQL Root Password with XAMPP on Localhost
+Follow the following steps:
+
+Open the XAMPP control panel and click on the shell and open the shell.
+
+In the shell run the following:
+
+```mysql -h localhost -u root -p```
+and press enter. It will ask for a password, by default the password is blank so just press enter
+
+Then just run the following query
+
+```SET PASSWORD FOR 'root'@'localhost' = PASSWORD('newpassword'); ```
+and press enter and your password is updated for root user on localhost
