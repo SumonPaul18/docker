@@ -1,4 +1,4 @@
-version: "2.2"
+version: "3"
 services:
   db:
     image: mysql:latest
@@ -6,10 +6,10 @@ services:
     volumes:
       - /nfs-share/streamlit/st-mysql/:/var/lib/mysql:rw
     environment:
-      MYSQL_ROOT_PASSWORD: centos@123
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: sysadmin
-      MYSQL_PASSWORD: centos@123
+      MYSQL_ROOT_PASSWORD: streamlit
+      MYSQL_DATABASE: streamlit
+      MYSQL_USER: root
+      MYSQL_PASSWORD: streamlit
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     depends_on:
@@ -17,7 +17,7 @@ services:
     restart: always
     environment:
       PMA_HOST: db
-      PMA_USER: sysadmin
-      PMA_PASSWORD: centos@123
+      PMA_USER: root
+      PMA_PASSWORD: streamlit
     ports:
-      - "8011:80"  
+      - "8013:80"  
