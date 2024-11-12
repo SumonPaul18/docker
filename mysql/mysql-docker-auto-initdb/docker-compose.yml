@@ -1,0 +1,30 @@
+version: "3"
+services:
+  # mysql container
+  streamlit-db-2:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: streamlit
+      MYSQL_DATABASE: stdata
+      MYSQL_USER: streamlit
+      MYSQL_PASSWORD: streamlit
+    volumes:
+      - $PWD/mysql/:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    networks:
+      - mysql-st-crud-auto
+  # phpmyadmin container
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - streamlit-db-2
+    restart: always
+    environment:
+      PMA_HOST: streamlit-db-2
+      PMA_USER: streamlit
+      PMA_PASSWORD: streamlit
+    ports:
+      - "8014:80"
+    networks:
+      - mysql-st-crud-auto
