@@ -53,6 +53,7 @@ SET PASSWORD FOR 'root'@'localhost' = PASSWORD('newpassword');
 and press enter and your password is updated for root user on localhost
 #
 #### 3. MYSQL Container Error from Docker
+
 ```
 [ERROR] [Entrypoint]: MYSQL_USER="root", MYSQL_USER and MYSQL_PASSWORD are for configuring a regular user and cannot be used for the root user
 Remove MYSQL_USER="root" and use one of the following to control the root user password:
@@ -60,4 +61,8 @@ Remove MYSQL_USER="root" and use one of the following to control the root user p
 - MYSQL_ALLOW_EMPTY_PASSWORD
 - MYSQL_RANDOM_ROOT_PASSWORD
 ```
+
+Solution:
+
+remove MYSQL_USER=root as root user is created by default and when you use MYSQL_USER=root it tries to create a new normal user with name root which cause conflict.
 ---
