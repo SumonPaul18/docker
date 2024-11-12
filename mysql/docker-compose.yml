@@ -1,23 +1,24 @@
 version: "3"
 services:
-  db:
-    image: mysql:latest
+  streamlit-db:
+    image: mysql:5.7
     restart: always
-    volumes:
-      - /nfs-share/streamlit/st-mysql/:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: streamlit
       MYSQL_DATABASE: streamlit
-      MYSQL_USER: root
+      MYSQL_USER: streamlit
       MYSQL_PASSWORD: streamlit
+    volumes:
+      - $PWD/mysql/:/var/lib/mysql
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     depends_on:
-      - db
+      - streamlit-db
     restart: always
     environment:
-      PMA_HOST: db
-      PMA_USER: root
+      PMA_HOST: streamlit-db
+      PMA_USER: streamlit
       PMA_PASSWORD: streamlit
     ports:
-      - "8013:80"  
+      - "8012:80"
