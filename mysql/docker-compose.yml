@@ -4,7 +4,7 @@ services:
     image: mysql:latest
     restart: always
     volumes:
-      - nfsvolume-mysql:/var/lib/mysql:rw
+      - /nfs-share/streamlit/st-mysql/:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: centos@123
       MYSQL_DATABASE: wordpress
@@ -20,4 +20,4 @@ services:
       PMA_USER: sysadmin
       PMA_PASSWORD: centos@123
     ports:
-      - "8009:80"  
+      - "8011:80"  
