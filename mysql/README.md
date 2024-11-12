@@ -65,4 +65,5 @@ Remove MYSQL_USER="root" and use one of the following to control the root user p
 Solution:
 
 remove MYSQL_USER=root as root user is created by default and when you use MYSQL_USER=root it tries to create a new normal user with name root which cause conflict.
+
 ---
