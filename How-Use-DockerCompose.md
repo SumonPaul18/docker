@@ -12,19 +12,19 @@ Show docker compose list
 
 Up docker compose
     
-    docker-compose up -d
+    docker compose up -d
 
 Down docker compose
 
-    docker-compose down
+    docker compose down
 
 docker compose up with a non-default yml file name
 
-    docker-compose -f docker-compose.prod.yml up -d
+    docker compose -f docker-compose.prod.yml up -d
 
 docker compose down with a non-default yml file name
 
-    docker-compose -f docker-compose-test.yml down
+    docker compose -f docker-compose-test.yml down
 
 How to add hosts in /etc/hosts files
     
