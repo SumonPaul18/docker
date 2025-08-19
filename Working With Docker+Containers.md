@@ -1869,5 +1869,485 @@ Run:
 ✅ Clean up with `prune` regularly  
 
 ---
+## 🐳 46. Working with Docker Hub (Push & Pull Images)
+
+Docker Hub is like GitHub, but for Docker images. You can **upload (push)** your custom images and **download (pull)** them from any machine.
+
+### 🔐 Step 1: Create a Docker Hub Account
+Go to: [https://hub.docker.com](https://hub.docker.com)  
+Sign up with your email or GitHub.
+
+> Example username: `paulco`
+
+---
+
+### 🔐 Step 2: Login from Command Line
+```bash
+docker login
+```
+
+Enter your Docker Hub **username** and **password**.
+
+> ✅ Success: `Login Succeeded`
+
+---
+
+### 🏷️ Step 3: Tag Your Image (Required for Push)
+You must tag your image as:  
+`username/repository-name:tag`
+
+Example:
+```bash
+docker tag mywebapp paulco/mywebapp:v1
+```
+
+> This does **not** create a new image. It just adds a label.
+
+---
+
+### 🚀 Step 4: Push Image to Docker Hub
+```bash
+docker push paulco/mywebapp:v1
+```
+
+> Wait for upload to complete.
+
+Now anyone can use your image:
+```bash
+docker pull paulco/mywebapp:v1
+```
+
+---
+
+### 📥 Step 5: Pull from Docker Hub
+To download someone else’s image:
+```bash
+docker pull nginx
+```
+
+Or a specific user’s image:
+```bash
+docker pull paulco/mywebapp:v1
+```
+
+Then run it:
+```bash
+docker run -d -p 8080:80 paulco/mywebapp:v1
+```
+
+---
+
+### 🧹 Optional: Remove Local Image Before Pulling
+```bash
+docker rmi paulco/mywebapp:v1
+docker pull paulco/mywebapp:v1
+```
+
+---
+
+## 🔐 47. Secure Your Docker Hub Login (Use Token)
+
+⚠️ Never use your password directly on shared or cloud machines.
+
+### ✅ Use Access Token Instead
+1. Go to: [https://hub.docker.com/settings/security](https://hub.docker.com/settings/security)
+2. Click: **New Access Token**
+3. Copy the token (e.g., `abc123xyz`)
+4. Login using token:
+```bash
+docker login -u paulco
+# When asked for password, paste the token
+```
+
+> ✅ Safer than using real password.
+
+---
+
+## 🧱 48. Best Practices for Docker Hub
+
+| Rule | Why |
+|------|-----|
+| ✅ Use meaningful tags | `v1`, `prod`, `latest`, not `test123` |
+| ✅ Don’t push secrets | Never include passwords in images |
+| ✅ Use `.dockerignore` | Prevents sending unnecessary files |
+| ✅ Keep images small | Use `alpine` or slim versions |
+| ✅ Update base images | Security patches matter |
+| ✅ Use multi-stage builds | Reduces final image size |
+
+---
+
+## 🔄 49. Auto-Push Images in CI/CD (Example: GitHub Actions)
+
+You can automate pushing images when code changes.
+
+### Example Workflow (`.github/workflows/push.yml`)
+```yaml
+name: Push to Docker Hub
+on: [push]
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          tags: paulco/myapp:latest
+          push: true
+```
+
+> This runs on every `git push`.
+
+---
+
+## 🔍 50. Inspect Image from Docker Hub (Without Running)
+
+See what’s inside an image before using it.
+
+```bash
+docker inspect nginx
+```
+
+Filter specific info:
+```bash
+# Show exposed ports
+docker inspect nginx --format='{{.Config.ExposedPorts}}'
+
+# Show CMD
+docker inspect nginx --format='{{.Config.Cmd}}'
+
+# Show environment variables
+docker inspect nginx --format='{{.Config.Env}}'
+```
+
+---
+
+## 🧰 51. Run One-Off Commands (Like Testing)
+
+Run and remove container after use.
+
+```bash
+docker run --rm ubuntu echo "Hello from temp container"
+```
+
+Useful for:
+- Testing commands
+- Converting files
+- Debugging
+
+Example: Check curl version
+```bash
+docker run --rm curlimages/curl --version
+```
+
+---
+
+## 📊 52. Monitor All Containers (Real-Time)
+
+See CPU, memory, network usage live.
+
+```bash
+docker stats
+```
+
+Show only specific container:
+```bash
+docker stats webserver
+```
+
+> Press `Ctrl+C` to stop.
+
+---
+
+## 🧪 53. Debug a Broken Container
+
+If a container exits immediately, check logs:
+
+```bash
+docker logs webserver
+```
+
+If no logs, run interactively:
+```bash
+docker run -it --rm ubuntu /bin/bash
+```
+
+Test command manually:
+```bash
+apt-get update
+nginx -t
+```
+
+---
+
+## 🧩 54. Use `.env` File with Docker Run
+
+Store environment variables in `.env` file.
+
+`.env`:
+```env
+DB_HOST=db.example.com
+DB_PORT=5432
+DB_USER=admin
+DB_PASS=secret123
+```
+
+Use in run:
+```bash
+docker run --env-file .env ubuntu env
+```
+
+> Shows all variables set.
+
+---
+
+## 🧱 55. Multi-Stage Builds (Advanced Example)
+
+Build app and run in smaller image.
+
+```Dockerfile
+# Stage 1: Build
+FROM node:16 AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Stage 2: Run
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+Build:
+```bash
+docker build -t paulco/static-site .
+```
+
+> Final image has **no Node.js**, only HTML + Nginx.
+
+---
+
+## 🔐 56. Security: Scan Images for Vulnerabilities
+
+Scan for security issues.
+
+```bash
+docker scan nginx
+```
+
+Or for your image:
+```bash
+docker scan paulco/mywebapp:v1
+```
+
+> Shows CVEs (security flaws) in packages.
+
+Fix by:
+- Updating base image
+- Removing unused tools
+- Using distroless images
+
+---
+
+## 🧱 57. Use Smaller Base Images
+
+Smaller = Faster + More Secure
+
+| Image | Size | Use Case |
+|------|------|---------|
+| `alpine` | ~5MB | Lightweight Linux |
+| `ubuntu:20.04` | ~70MB | Full Ubuntu |
+| `node:16-alpine` | ~120MB | Node.js app |
+| `node:16` | ~900MB | Development |
+
+Prefer Alpine when possible:
+```Dockerfile
+FROM node:16-alpine
+RUN npm install
+CMD ["node", "server.js"]
+```
+
+---
+
+## 📁 58. Bind Mount vs Volume – When to Use?
+
+| Feature | Bind Mount | Named Volume |
+|--------|------------|--------------|
+| Path | `~/app:/app` | `appdata:/app` |
+| Managed by | You | Docker |
+| Best for | Dev (code sharing) | Prod (databases) |
+| Backup | Manual | Easy |
+| Portability | ❌ | ✅ |
+
+### ✅ Use Bind Mount for Development
+```bash
+docker run -v $(pwd):/app node:16-alpine
+```
+
+### ✅ Use Named Volume for Production
+```bash
+docker volume create db-data
+docker run -v db-data:/var/lib/mysql mysql
+```
+
+---
+
+## 🧰 59. Essential Debug Commands
+
+| Command | Purpose |
+|--------|--------|
+| `docker ps` | List running containers |
+| `docker ps -a` | List all containers |
+| `docker logs <name>` | View logs |
+| `docker exec -it <name> sh` | Enter container |
+| `docker inspect <name>` | See full config |
+| `docker stats` | Live resource usage |
+| `docker history <image>` | See image layers |
+| `docker system df` | Disk usage |
+
+---
+
+## 🧹 60. Daily Cleanup Script (Recommended)
+
+Save as `cleanup.sh`:
+```bash
+#!/bin/bash
+echo "Stopping all containers..."
+docker stop $(docker ps -aq)
+
+echo "Removing all containers..."
+docker rm $(docker ps -aq)
+
+echo "Removing unused images..."
+docker image prune -a -f
+
+echo "Removing unused volumes..."
+docker volume prune -f
+
+echo "Removing unused networks..."
+docker network prune -f
+
+echo "Cleanup complete!"
+```
+
+Make executable:
+```bash
+chmod +x cleanup.sh
+```
+
+Run:
+```bash
+./cleanup.sh
+```
+
+> Great for dev machines.
+
+---
+
+## 🚀 61. Deploy Container on Server (Real Example)
+
+On your **cloud server** (e.g., DigitalOcean, AWS):
+
+```bash
+# 1. Pull image from Docker Hub
+docker pull paulco/mywebapp:v1
+
+# 2. Run with port and auto-restart
+docker run -d \
+  --name mysite \
+  -p 80:80 \
+  --restart=unless-stopped \
+  paulco/mywebapp:v1
+```
+
+> Site now live at: `http://your-server-ip`
+
+---
+
+## 🔐 62. Never Run as Root (Security)
+
+Avoid this:
+```Dockerfile
+# BAD: Runs as root
+CMD ["nginx"]
+```
+
+Do this:
+```Dockerfile
+# GOOD: Create user
+RUN adduser -D appuser
+USER appuser
+CMD ["./start.sh"]
+```
+
+Or at runtime:
+```bash
+docker run --user 1000:1000 ubuntu id
+```
+
+> Prevents full system access if hacked.
+
+---
+
+## 📦 63. Use Scratch for Tiny Images (Advanced)
+
+`scratch` is an empty image. Used for compiled apps (Go, Rust).
+
+```Dockerfile
+FROM golang:alpine AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o main .
+
+# Stage 2: Use scratch
+FROM scratch
+COPY --from=builder /app/main /main
+CMD ["/main"]
+```
+
+> Final image = only your binary. ~5MB or less.
+
+---
+
+## 🧭 64. Final Checklist: Production Ready?
+
+✅ Image pushed to Docker Hub  
+✅ Tagged with version (`v1`, not `latest`)  
+✅ Uses non-root user  
+✅ Has restart policy  
+✅ Logs are accessible  
+✅ Data stored in named volume  
+✅ No secrets in image  
+✅ Small base image (e.g., `alpine`)  
+✅ Tested on clean machine  
+✅ Firewall allows required ports  
+
+---
+
+## 🎉 Congratulations! You’ve Mastered Docker!
+
+You now know:
+
+- ✅ Basics: run, build, exec, logs  
+- ✅ Volumes & Networks  
+- ✅ Dockerfile & Docker Compose  
+- ✅ Security & Best Practices  
+- ✅ Docker Hub (push/pull)  
+- ✅ Automation & CI/CD  
+- ✅ Production deployment  
+
+---
+
 
 
