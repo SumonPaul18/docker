@@ -1410,5 +1410,464 @@ docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
 - Keep your base images updated (e.g., `alpine`, `ubuntu:22.04`).
 
 ---
+## 🔐 37. **Docker Security Best Practices**
+
+### ✅ Why It Matters
+Running containers as root or with full privileges can be dangerous. If a container is compromised, the attacker could access the host system.
+
+### 🛡️ How to Secure Your Containers
+
+#### ➤ Run as Non-Root User (Recommended)
+```Dockerfile
+FROM ubuntu:20.04
+RUN useradd -m appuser
+USER appuser
+CMD ["sleep", "3600"]
+```
+
+Or at runtime:
+```bash
+docker run -it --user 1000 ubuntu /bin/bash
+```
+
+> `1000` = user ID on host.
+
+---
+
+#### ➤ Drop All Capabilities
+Remove all Linux capabilities by default.
+
+```bash
+docker run --cap-drop=all ubuntu
+```
+
+Then add only what you need:
+```bash
+docker run --cap-drop=all --cap-add=NET_BIND_SERVICE nginx
+```
+
+> Allows binding to port 80 without full root access.
+
+---
+
+#### ➤ Read-Only Filesystem
+Prevent changes inside container.
+
+```bash
+docker run --read-only ubuntu touch /test
+# Will fail: no write access
+```
+
+Use temporary space:
+```bash
+docker run --read-only --tmpfs /tmp ubuntu ls /tmp
+```
+
+---
+
+#### ➤ Disable Inter-Process Communication (IPC)
+```bash
+docker run --ipc=none ubuntu
+```
+
+Prevents shared memory attacks.
+
+---
+
+#### ➤ Limit Resources (CPU & Memory)
+Avoid one container using all system resources.
+
+```bash
+# Limit to 512MB RAM
+docker run -m 512m nginx
+
+# Limit to 1 CPU core
+docker run --cpus=1 nginx
+
+# Combine both
+docker run -m 512m --cpus=0.5 nginx
+```
+
+> Useful for multi-tenant servers.
+
+---
+
+## 🧩 38. **Docker Compose Advanced Features**
+
+### 📄 Use `.env` File for Environment Variables
+Create `.env`:
+```env
+DB_USER=admin
+DB_PASS=secret123
+WEB_PORT=8080
+```
+
+Use in `docker-compose.yml`:
+```yaml
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+```
+
+> Docker Compose automatically loads `.env`.
+
+---
+
+### 🔁 Use Profiles to Control Services
+Only start some services when needed.
+
+```yaml
+version: '3.8'
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+  db:
+    image: mysql:8.0
+    profiles: 
+      - dev
+      - database
+  redis:
+    image: redis
+    profiles: 
+      - cache
+```
+
+Start only web:
+```bash
+docker-compose up web
+```
+
+Start web + db:
+```bash
+docker-compose --profile dev up
+```
+
+---
+
+### 🔄 Restart Policies in Compose
+Make services auto-restart.
+
+```yaml
+services:
+  web:
+    image: nginx
+    restart: unless-stopped
+```
+
+Options:
+- `no` – Never restart
+- `on-failure` – Only if fails
+- `always` – Always restart
+- `unless-stopped` – Always, unless manually stopped
+
+> Best for production.
+
+---
+
+## 🧱 39. **BuildKit: Faster & Smarter Builds**
+
+### ✅ Enable BuildKit
+Set environment variable:
+```bash
+export DOCKER_BUILDKIT=1
+```
+
+Or run:
+```bash
+DOCKER_BUILDKIT=1 docker build -t myapp .
+```
+
+> Faster builds, better caching, colored output.
+
+---
+
+### 🧩 Use `# syntax=docker/dockerfile:1`
+Add to top of Dockerfile:
+```Dockerfile
+# syntax=docker/dockerfile:1
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install -y curl
+```
+
+Enables advanced features like:
+- `RUN --mount=type=cache`
+- Secret mounting
+- Conditional logic
+
+---
+
+### 🗃️ Cache Dependencies (Node.js Example)
+```Dockerfile
+# syntax=docker/dockerfile:1
+FROM node:16
+
+WORKDIR /app
+
+# Copy package files first
+COPY package*.json ./
+
+# Install with cache mount
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --only=production
+
+COPY . .
+
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+> Speeds up rebuilds by reusing `node_modules`.
+
+---
+
+## 🔐 40. **Secret Management (For Production)**
+
+### ❌ Never Do This
+```Dockerfile
+ENV DB_PASSWORD=mypassword
+```
+
+Passwords end up in image history!
+
+---
+
+### ✅ Use Docker Secrets (With Swarm)
+Create secret:
+```bash
+echo "mypassword" | docker secret create db_pass -
+```
+
+Use in `docker-compose.yml`:
+```yaml
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_pass
+    secrets:
+      - db_pass
+
+secrets:
+  db_pass:
+    external: true
+```
+
+> Only works in **Swarm mode**.
+
+---
+
+### ✅ Use `.env` + `environment:` (For Dev)
+```yaml
+environment:
+  - DB_PASSWORD=${DB_PASS}
+```
+
+And `.env`:
+```env
+DB_PASS=mysecretpassword
+```
+
+> Never commit `.env` to Git.
+
+---
+
+## 🌐 41. **Docker Swarm (Basic Cluster Setup)**
+
+### ➤ Initialize Swarm
+```bash
+docker swarm init
+```
+
+> Turns your machine into a manager node.
+
+---
+
+### ➤ Create a Service (Instead of Container)
+```bash
+docker service create --name web -p 80:80 nginx
+```
+
+> Like `docker run`, but scalable.
+
+---
+
+### ➤ Scale the Service
+```bash
+docker service scale web=3
+```
+
+> Runs 3 copies of Nginx.
+
+---
+
+### ➤ Update Service (Zero Downtime)
+```bash
+docker service update --image nginx:alpine web
+```
+
+> Rolling update.
+
+---
+
+### ➤ Leave Swarm
+```bash
+docker swarm leave --force
+```
+
+---
+
+## 🧪 42. **Health Checks in Docker**
+
+### ✅ Why Use Health Checks?
+Know if your app inside container is actually working.
+
+### 🛠️ Add to Dockerfile
+```Dockerfile
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/ || exit 1
+```
+
+Or in `docker run`:
+```bash
+docker run \
+  --health-cmd="curl -f http://localhost || exit 1" \
+  --health-interval=30s \
+  --health-retries=3 \
+  nginx
+```
+
+Check status:
+```bash
+docker inspect <container> | grep -i health
+```
+
+> Shows: `healthy`, `unhealthy`, or `starting`.
+
+---
+
+## 📁 43. **Bind Mounts vs Named Volumes – When to Use Which?**
+
+| Feature | Bind Mount | Named Volume |
+|--------|-----------|---------------|
+| Location | Host path (`~/data`) | Docker-managed (`/var/lib/docker/volumes/`) |
+| Portability | ❌ Not portable | ✅ Portable |
+| Backup | Manual | Easy with volume tools |
+| Use Case | Config files, dev code | Databases, persistent data |
+
+### ✅ Best Practice
+- Use **bind mounts** for config/code during development.
+- Use **named volumes** for databases and production data.
+
+---
+
+## 🧰 44. **Debugging Tips & Tricks**
+
+### 🔍 See What’s Inside a Running Container
+```bash
+docker exec -it mycontainer ps aux
+```
+
+See network:
+```bash
+docker exec -it mycontainer ip a
+```
+
+Check disk:
+```bash
+docker exec -it mycontainer df -h
+```
+
+---
+
+### 📦 Inspect Image Layers
+See how much space each layer uses:
+```bash
+docker history nginx
+```
+
+---
+
+### 🐞 Run BusyBox for Debugging
+```bash
+docker run -it --rm busybox sh
+```
+
+Tiny Linux environment for testing networks, files, etc.
+
+---
+
+### 📜 View Logs with Timestamps
+```bash
+docker logs -f --timestamps webserver
+```
+
+---
+
+## 🔄 45. **Automate with Shell Scripts**
+
+### 🧹 Auto-Cleanup Script
+Save as `clean-docker.sh`:
+```bash
+#!/bin/bash
+echo "Stopping all containers..."
+docker stop $(docker ps -aq)
+
+echo "Removing all containers..."
+docker rm $(docker ps -aq)
+
+echo "Removing unused images..."
+docker image prune -a -f
+
+echo "Removing unused volumes..."
+docker volume prune -f
+
+echo "Cleanup complete!"
+```
+
+Make executable:
+```bash
+chmod +x clean-docker.sh
+```
+
+Run:
+```bash
+./clean-docker.sh
+```
+
+> Great for CI/CD or local cleanup.
+
+---
+
+## 📚 Final Words: From Beginner to Pro
+
+| Level | What You Should Know |
+|------|------------------------|
+| 🔹 Beginner | `run`, `ps`, `exec`, `build`, `pull` |
+| 🔹🔹 Intermediate | `volumes`, `networks`, `Dockerfile`, `compose` |
+| 🔹🔹🔹 Advanced | `security`, `health checks`, `BuildKit`, `Swarm`, `secrets` |
+
+---
+
+## 🎯 Summary: Advanced Docker Checklist
+
+✅ Run containers as non-root  
+✅ Use `--cap-drop=all` and add only needed caps  
+✅ Limit CPU & memory usage  
+✅ Use `.dockerignore` and `.env`  
+✅ Use named volumes for databases  
+✅ Use multi-stage builds  
+✅ Use health checks  
+✅ Use Docker Compose profiles  
+✅ Enable BuildKit for faster builds  
+✅ Never store secrets in Dockerfiles  
+✅ Clean up with `prune` regularly  
+
+---
 
 
