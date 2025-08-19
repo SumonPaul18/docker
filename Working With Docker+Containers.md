@@ -1,604 +1,995 @@
-#
-## Working With Docker Containers
-#
-Get detailed information about docker:
-####
-    docker info
-####
-Docker version
-####
-    docker --version
-Search for Docker Images:<br>
-[ubuntu] is a image name, here as our needed image
-####
-    docker search ubuntu    
-####
-Pull a Docker Image: <br>
-Download the official Ubuntu image by running
-####
-    docker pull ubuntu
-####
-View Downloaded Images:
-####
-    docker images
-####
-Run a Docker Container with non-interactive mode: <br>
-[ubuntu] is our downloaded image. if haven't download previously, then would download image when run this command.
-####
-    docker run ubuntu    
-####
-Run a Docker Container with a container name and non-interactive mode <br>
-docker run --name [container-name] [image-name]
+# Working With Docker & Containers – Complete Step-by-Step Guide
 
-    docker run --name myubuntu ubuntu
+This guide is based on your uploaded file. All commands and topics have been organized **step-by-step**, grouped by **topic**, and written in **simple English**. Each command is clearly separated and explained so you can follow along easily.
 
-Run a Docker Container with interactive shell access
+---
 
-[ubuntu] is a image name and -it is interactive mode
+## 🔍 1. Docker System Information
 
-    docker run -it ubuntu
+Check basic info about Docker.
 
-NOTE:Back from Container Terminal to Host Terminal with stoping the Container
+```bash
+# Show detailed Docker system info
+docker info
+```
 
-    exit
+```bash
+# Check Docker version
+docker --version
+```
 
-NOTE:Back from Container Terminal to Host Terminal without stoping the Container
+---
 
-    ctrl+p+q
+## 📦 2. Docker Images
 
-Run Ubuntu Container with tag
+### 🔎 Search for an Image
+Search Docker Hub for available images.
 
-[:latest is a images tag, we are run specefic images verify with tag
+```bash
+docker search ubuntu
+```
 
-tag means: latest, version, or identified by a images. 
+---
 
-    docker run –it ubuntu:latest /bin/bash 
+### 📥 Pull (Download) an Image
+Download an image from Docker Hub.
 
-Container running in the background with bash shell.
+```bash
+docker pull ubuntu
+```
 
-Here -i for interactive mode, -t for terminal, -d for daemon mode, bash for bash shell mode
+> If you don’t pull first, `docker run` will automatically download it.
 
-    docker run -it -d ubuntu bash
+---
 
-Enter a Container to Access Bash Shell in Terminal.
+### 🖼️ List All Downloaded Images
+See all images saved on your computer.
 
-Here, using exec for execution to container, /bin/bash for terminal mode.
+```bash
+docker images
+```
 
-    docker exec -it ubuntu /bin/bash
+---
 
-Enter a Container to Access Shell in Terminal.
+### 🗑️ Remove an Image
+Delete a downloaded image.
 
-docker exec -it container-name sh
-
-sh for shell terminal
-
-    docker exec -it ubuntu sh
-
-# Run Nginx container for web server
-
--p for port, My local machine port 8000  maping to with nginx container port 80.   
-
-    docker run -it -d -p 8000:80 nginx
-
-Run a webserver using nginx container with bridge network & mapping port
-
-Access the webserver local Machine ip: http://192.168.106.110:8080/
-
-    docker run -dit --name webserver1 --network bridge -p 8080:80 nginx
-
-Run nginx container with Host Volume & Nginx Defaulf Configuration 
-
-    docker run --name docker-nginx -p 80:80 -v ~/docker-nginx/html:/usr/share/nginx/html -v ~/docker-nginx/default.conf:/etc/nginx/conf.d/default.conf -d nginx
-
-
-# Add Hostname on a Container
-
--h for hostname 
-
-    docker run -dit --name ubuntu-nginx -h mail ubuntu
-
-How to Add Hosts file on Container
-
-    docker run --add-host=mail.paulco.xyz:172.17.0.4 -it ubuntu /bin/bash
-
-Adding Multiple Entries in Hosts file on a container
-
-    docker run --add-host=1.example.com:10.0.0.1 --add-host=2.example2.com:10.0.0.2 --add-host=3.example.com:10.0.0.3 ubuntu cat /etc/hosts
-
-Add Hostname & hosts file with port on a Container 
-
-    docker run -dit --name ubuntu-nginx -h mail --add-host=mail.paulco.xyz:172.17.0.3 -p 81:81 ubuntu
-
-# Execute Command from outside of Container
-
-Run a Linux command on a container immediately, without entering the container.
-
-docker exec webserver bash -c "linux command"
-
-    docker exec -it 39361978fd68 bash -c df -h
-#### 
-    docker exec -it 39361978fd68 bash -c "cat /etc/lsb-release"
-
-
-# Push Command, when use docker run
-
-    docker run ubuntu bash -c "apt-get -y update" 
-
-    docker run ubuntu bash -c "apt-get -y install nginx" 
-
-Automatically remove the Ubuntu container, when we stop the container.
-
-the --rm flag instructs Docker to automatically remove the Ubuntu Docker container after we stop it.
-
-    docker run -it --rm ubuntu /bin/bash
-
-
-# Save a Configured Container
-
-
-#1st run a container then configure as your required and stop the container.
-#web1 is old container and web2 is new container which save from web1.
-
-docker stop web1
-
-docker commit web1 web2
-
-#Create a Images from runing container.
-#docker commit -m "Container from Image" [Container ID/Name] [NewImage name]
-# -m for message, [53d6649f23f6] runiing container id, web1 are new image name
-
-docker commit -m "Container from Image" 53d6649f23f6 web1
-
-+++++++++++++++++++++++++++++++++
-
-++++++++++++++++++++++++++++++++++++++++++++++++++
-+ Persisting Data on the Ubuntu Docker Container +
-++++++++++++++++++++++++++++++++++++++++++++++++++
-
-#Let's create it in the home directory and name it DockerShare:
-
-mkdir -p DockerShare
-
-#Create a Container with Persist Data using the DockerShare directory.
-#Create the /data directory within the Docker container. The /data directory is mapped to the DockerShare folder you created earlier.
-
-docker run -it --rm -v ~/DockerShare:/data ubuntu /bin/bash
-
-++++++++++++++++++++++++++++++++++++++++++++++++++
-
-#How to Rename the Container:
-#docker rename container-name new-name
-
-docker rename webserver webserver1
-
-#View Docker Containers
-
-#list Only active containers.
-
-docker ps    
-
-#list all containers active-inactive using -a flag.
-
-docker ps -a   
-
-#list latest container using -l flag.
-
-docker ps -l    
-
-#How to run an existing container.
-
-#Start a Docker Container:
-#docker start [container-ID or container-name]
-#[5f9478691970] is a container ID [ubuntu] is a container name. we can use container name.
-
-docker start 5f9478691970    
-docker start ubuntu
-
-#Restart a Container
-docker restart 09ca6feb6efc
-
-#How to execute existing container.
-#docker exec -it existing_container_ID_or_name /bin/bash
-#[webserver1] is a container name.
-
-docker exec -it webserver1 /bin/bash
-
-
-#Stop a Docker Container:
-#docker stop [container-ID | container-name]
-#[5f9478691970] is a container ID. we can use container name.
-
-docker stop 5f9478691970    
-
-#Stop all running Containers:
-
-docker stop $(docker ps -aq)
-
-#Kill a Container
-
-docker kill 09ca6feb6efc
-
-#Remove a Docker Container:
-#docker rm [container-ID | container-name]
-#[ubuntu] is a container name. we can use container ID.
-
-docker rm ubuntu    
-
-#Remove all Containers
-
-docker rm $(docker ps -aq)
-
-#Remove all Stopped Containers:
-
-docker rm $(docker ps -aq --filter  status="exited")
-
-#Removed all the containers:
-
-docker container prune
-
-
-#Remove Docker image:
-#docker rmi -f <imageId/Name>
-
+```bash
 docker rmi fce289e99eb9
+```
 
-#Forcefully Remove Image:
-#docker rmi -f <imageId/Name>
+> Replace `fce289e99eb9` with the actual image ID or name.
 
+---
+
+### 🚫 Force Remove an Image
+Remove even if the image is being used.
+
+```bash
 docker rmi -f fce289e99eb9
+```
 
-#Removing all Images:
+---
 
+### 🗑️ Remove All Images
+Delete all downloaded images.
+
+```bash
 docker rmi $(docker images -q)
+```
 
+---
 
-#Dangling Images:
+### 🧹 Clean Up Unused Images
+Remove unused ("dangling") images.
 
+```bash
 docker image prune
+```
 
+To remove all unused images (not just dangling ones):
 
-++++++++++++++++++++++++++++++++ End ++++++++++++++++++++++++++++++++
+```bash
+docker image prune -a
+```
 
-++++++++++++++++++++++++++++++++
-+ Extra Usefull Docker Command +
-++++++++++++++++++++++++++++++++
+---
 
-#Display a live stream of container(s) resource usage statistics.
-#docker stats [container id/name]
+## 🐳 3. Run Docker Containers
 
-docker stats webserver
+### ▶️ Run a Container (Non-Interactive)
+Start a container and run default command.
 
-#Pause or Suspends all processes in a specified container.
+```bash
+docker run ubuntu
+```
 
-docker pause webserver
+> This runs and exits immediately.
 
-#Unpause all processes within one or more containers.
+---
 
-docker unpause webserver
+### 🏷️ Run with Custom Name
+Give your container a name.
 
-#Copy from a docker container to the local system.
-#I am copying index.html file inside a docker container name is  webserver1 to /home/user/.
+```bash
+docker run --name myubuntu ubuntu
+```
 
-docker cp webserver1:/usr/share/nginx/html/index.html /home/user/
+---
 
-#Copy from local system to the a docker container.
-#I am copying index.html file from my local system to inside a docker container name is  webserver1 to /home/user/.
+### 🖥️ Run with Interactive Shell Access
+Enter the container like a real Linux terminal.
 
-docker cp index.html webserver1:/usr/share/nginx/html/index.html
+```bash
+docker run -it ubuntu /bin/bash
+```
 
-#Shows the history of a docker image.
+> Use `/bin/bash` if available, or `/bin/sh` for smaller images.
 
-docker history httpd
+---
 
-#Show the logs of the docker container.
+### 🔄 Exit Without Stopping Container
+Leave the container running.
 
-docker logs 09ca6feb6efc
+```text
+Press: Ctrl + P, then Ctrl + Q
+```
 
-#Update container configurations.
+> This detaches from the container without stopping it.
 
-docker update --help
+---
 
-#Update the CPU configuration of docker container with container id mentioned in the command.
+### 🚪 Exit and Stop Container
+Close the container.
 
-docker update -c 1 2f6fb3381078
+```bash
+exit
+```
 
-++++++++++++++++++++++++++++++++ End ++++++++++++++++++++++++++++++++
+---
 
+### 🏷️ Run with Tag (Specific Version)
+Run a specific version of an image.
 
-+++++++++++++++++++++++
-+  Docker Networking: +
-+++++++++++++++++++++++
+```bash
+docker run -it ubuntu:latest /bin/bash
+```
 
-#Docker Network
+You can use any tag: `ubuntu:20.04`, `nginx:alpine`, etc.
 
-docker network
+---
 
-#Listing All Docker Networks
+### 🧊 Run in Background (Detached Mode)
+Run container in the background.
 
+```bash
+docker run -it -d ubuntu bash
+```
+
+> `-d` means "detached" — runs in background.
+
+---
+
+### 🔄 Re-enter a Running Container
+Go back into a running container.
+
+```bash
+docker exec -it ubuntu /bin/bash
+```
+
+Or by name:
+
+```bash
+docker exec -it myubuntu /bin/bash
+```
+
+---
+
+### 🖥️ Run with Shell (sh)
+Use `sh` if `bash` is not installed.
+
+```bash
+docker exec -it ubuntu /bin/sh
+```
+
+---
+
+### 🌐 Run Nginx Web Server
+Start Nginx and map port 8000 (host) → 80 (container).
+
+```bash
+docker run -it -d -p 8000:80 nginx
+```
+
+> Access at: `http://localhost:8000`
+
+---
+
+### 🌐 Run Web Server with Name & Network
+Start Nginx with name, bridge network, and port.
+
+```bash
+docker run -dit --name webserver1 --network bridge -p 8080:80 nginx
+```
+
+> Access at: `http://192.168.106.110:8080` (use your host IP)
+
+---
+
+### 📁 Run Nginx with Volume (Shared Folder)
+Mount local folders into the container.
+
+```bash
+docker run --name docker-nginx \
+  -p 80:80 \
+  -v ~/docker-nginx/html:/usr/share/nginx/html \
+  -v ~/docker-nginx/default.conf:/etc/nginx/conf.d/default.conf \
+  -d nginx
+```
+
+> This shares HTML files and config from your computer.
+
+---
+
+### 🏷️ Set Hostname in Container
+Give the container a custom hostname.
+
+```bash
+docker run -dit --name ubuntu-nginx -h mail ubuntu
+```
+
+> `-h mail` sets hostname to `mail`.
+
+---
+
+### 📁 Add Hosts File Entry
+Add custom IP-to-hostname mapping.
+
+```bash
+docker run --add-host=mail.paulco.xyz:172.17.0.4 -it ubuntu /bin/bash
+```
+
+> This adds `mail.paulco.xyz` pointing to `172.17.0.4` in `/etc/hosts`.
+
+---
+
+### 📁 Add Multiple Hosts Entries
+Add more than one host entry.
+
+```bash
+docker run \
+  --add-host=1.example.com:10.0.0.1 \
+  --add-host=2.example2.com:10.0.0.2 \
+  --add-host=3.example.com:10.0.0.3 \
+  ubuntu cat /etc/hosts
+```
+
+> Shows `/etc/hosts` with all entries.
+
+---
+
+### 🏷️ + 📁 + 🌐 Combine: Hostname, Hosts, and Port
+Full example with all options.
+
+```bash
+docker run -dit \
+  --name ubuntu-nginx \
+  -h mail \
+  --add-host=mail.paulco.xyz:172.17.0.3 \
+  -p 81:81 \
+  ubuntu
+```
+
+---
+
+## 💡 4. Run Commands Without Entering Container
+
+### ⚙️ Run a Command Inside Container
+Run a Linux command without entering.
+
+```bash
+docker exec webserver bash -c "df -h"
+```
+
+---
+
+### 📄 View OS Info
+Check what OS is inside the container.
+
+```bash
+docker exec -it 39361978fd68 bash -c "cat /etc/lsb-release"
+```
+
+---
+
+### 📥 Update Packages
+Update inside Ubuntu container.
+
+```bash
+docker run ubuntu bash -c "apt-get -y update"
+```
+
+---
+
+### 📦 Install Software
+Install Nginx in Ubuntu container.
+
+```bash
+docker run ubuntu bash -c "apt-get -y install nginx"
+```
+
+> Note: Changes are lost when container stops unless you commit.
+
+---
+
+### 🚫 Auto-Remove Container After Use
+Use temporary container (clean up automatically).
+
+```bash
+docker run -it --rm ubuntu /bin/bash
+```
+
+> `--rm` removes container when you exit.
+
+---
+
+## 💾 5. Save & Reuse Containers
+
+### 🖼️ Save Configured Container as New Image
+After making changes, save as a new image.
+
+```bash
+docker stop web1
+docker commit web1 web2
+```
+
+> `web1` is old container, `web2` is new image.
+
+---
+
+### 🖼️ Commit with Message
+Add a note when saving.
+
+```bash
+docker commit -m "Installed Nginx" 53d6649f23f6 web1
+```
+
+> Good for tracking changes.
+
+---
+
+## 💾 6. Persist Data (Volumes)
+
+### 📁 Create Shared Folder
+Make a folder to share with container.
+
+```bash
+mkdir -p ~/DockerShare
+```
+
+---
+
+### 📁 Mount Folder into Container
+Link host folder to container.
+
+```bash
+docker run -it --rm -v ~/DockerShare:/data ubuntu /bin/bash
+```
+
+> Anything in `/data` inside container is saved in `~/DockerShare` on host.
+
+---
+
+## 🔁 7. Manage Containers
+
+### 🔄 Rename a Container
+Change container name.
+
+```bash
+docker rename webserver webserver1
+```
+
+---
+
+### 📋 List Containers
+See running containers.
+
+```bash
+docker ps
+```
+
+---
+
+### 📋 List All Containers (Running + Stopped)
+Show all containers.
+
+```bash
+docker ps -a
+```
+
+---
+
+### 📋 Show Last Created Container
+Only show the most recent one.
+
+```bash
+docker ps -l
+```
+
+---
+
+### ▶️ Start a Stopped Container
+Restart a container.
+
+```bash
+docker start ubuntu
+```
+
+> Use container name or ID.
+
+---
+
+### 🔁 Restart a Container
+Restart running container.
+
+```bash
+docker restart 09ca6feb6efc
+```
+
+---
+
+### ⚙️ Execute Command in Running Container
+Run command without entering.
+
+```bash
+docker exec -it webserver1 /bin/bash
+```
+
+---
+
+### ⏹️ Stop a Container
+Gracefully stop a container.
+
+```bash
+docker stop 5f9478691970
+```
+
+---
+
+### ⏹️ Stop All Running Containers
+Stop all containers at once.
+
+```bash
+docker stop $(docker ps -aq)
+```
+
+---
+
+### 💥 Kill a Container Immediately
+Force stop (not graceful).
+
+```bash
+docker kill 09ca6feb6efc
+```
+
+---
+
+### 🗑️ Remove a Container
+Delete a stopped container.
+
+```bash
+docker rm ubuntu
+```
+
+---
+
+### 🗑️ Remove All Containers
+Delete all containers (must be stopped).
+
+```bash
+docker rm $(docker ps -aq)
+```
+
+---
+
+### 🗑️ Remove All Stopped Containers
+Only remove stopped ones.
+
+```bash
+docker rm $(docker ps -aq --filter status=exited)
+```
+
+---
+
+### 🧹 Remove All Unused Containers
+Clean up stopped containers.
+
+```bash
+docker container prune
+```
+
+---
+
+## 🌐 8. Docker Networking
+
+### 📋 List All Networks
+See all Docker networks.
+
+```bash
 docker network ls
+```
 
-#Inspecting a Docker network:
-#docker network inspect networkname 
+---
 
+### 🔍 Inspect a Network
+View details of a network.
+
+```bash
 docker network inspect bridge
+```
 
-#Creating Your Own New Network:
-#docker network create --driver <driver-name> <network-name> 
-#Docker Works on 3 types of driver by default (bridge, host, null).
+---
 
-docker network create –-driver bridge mynet
+### ➕ Create a Custom Network
+Make your own bridge network.
 
-#run a container connect with own network
+```bash
+docker network create --driver bridge mynet
+```
 
-docker run –it –network=mynet ubuntu /bin/bash
+---
 
-#Inspect mynet is create our own network
-#When inspect network then we see runing containers network informations.
+### 🔗 Connect Container to Custom Network
+Run container on your network.
 
-docker network inspect mynet
+```bash
+docker run -it --network=mynet ubuntu /bin/bash
+```
 
-#Connect a Container with Docker Network.
-#docker network connect <network-name> <container-name or id>
+---
 
+### 🔗 Connect Running Container to Network
+Add existing container to network.
+
+```bash
 docker network connect bridge webserver
+```
 
-#Disconnect a Container with Docker Network.
-#docker network disconnect <network-name> <container-name>
+---
 
+### 🔓 Disconnect Container from Network
+Remove from network.
+
+```bash
 docker network disconnect bridge webserver
+```
 
-#Remove a Docker Network
-#docker network rm <network-name>
+---
 
+### 🗑️ Remove a Network
+Delete unused network.
+
+```bash
 docker network rm mynet
+```
 
-#Remove all the unused Docker Networks
+---
 
+### 🧹 Remove All Unused Networks
+Clean up.
+
+```bash
 docker network prune
+```
 
-++++++++++++++++++++++++++++++++ End ++++++++++++++++++++++++++++++++
+---
 
-++++++++++++++++++++++++++
-+ Managing Docker Ports  +
-++++++++++++++++++++++++++
+## 🌐 9. Docker Ports
 
-#Expose our container port for access outside of Docker
-# [-p 8080:80] will map TCP port 80 in the container to port 8080 on the Docker host.
+### 🔄 Map Port (Host → Container)
+Map port 8080 (host) to 80 (container).
 
+```bash
 docker run -p 8080:80 --name webhost -d nginx
+```
 
-#How To Know Which Port Is Exposed
+---
 
-docker inspect nginx
+### 🔍 Check Exposed Ports of Image
+See what ports an image uses.
 
-docker inspect --format="{{.ContainerConfig.ExposedPorts}}" nginx
+```bash
+docker inspect --format='{{.ContainerConfig.ExposedPorts}}' nginx
+```
 
-#Expose Multiple Port on a Container.
+---
 
-docker run -dit --name mailserver -p 8080:80 -p 465:465 -p 25:25 -p 995:995 -p 587:587 -p 143:143 -p 110:110 -p 993:993 ubuntu
+### 🔄 Map Multiple Ports
+Open many ports at once.
 
-#Expose automatic port from local system
-#Using Capital [-P] for publish-all, Expose automatic port assign. 
+```bash
+docker run -dit \
+  --name mailserver \
+  -p 8080:80 \
+  -p 25:25 \
+  -p 587:587 \
+  -p 465:465 \
+  -p 143:143 \
+  -p 110:110 \
+  -p 993:993 \
+  -p 995:995 \
+  ubuntu
+```
 
+---
+
+### 🔁 Auto-Assign Port (Random)
+Let Docker pick a random port.
+
+```bash
 docker run -d --name webserver -P nginx:alpine
+```
 
-++++++++++++++++++++++++++++++++++++++++++++++++++
+> Use `docker port webserver` to see assigned port.
 
+---
 
-++++++++++++++++++++++++++++++++++++++++++
-+ How To Manage Firewall Port In CentOS  +
-++++++++++++++++++++++++++++++++++++++++++
-#Check Port Status
+## 🔐 10. Firewall & Port (CentOS/RHEL)
+
+### 🔍 Check if Port is Open
+```bash
 netstat -na | grep 55555
+```
 
-#Check Port Status in iptables
+---
+
+### 🔍 Check iptables
+```bash
 iptables-save | grep 55555
+```
 
-#Add the port
-vi /etc/services
-#service-name  port/protocol  [aliases ...]   [# comment]
-testport        55555/tcp   # Application Name
+---
 
-#Open firewall ports
-firewall-cmd --zone=public --add-port=55555/tcp --permanent
+### ➕ Add Port to Services File (Optional)
+```bash
+sudo nano /etc/services
+```
 
-#firewall-cmd --reload
+Add line:
+```
+testport        55555/tcp   # My App
+```
 
-Ref: https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
+---
 
-+++++++++++++++++++++++++++++++++++++++
-+ How to Change Nginx Port in Linux   +
-+++++++++++++++++++++++++++++++++++++++
+### 🔓 Open Port in Firewall (firewalld)
+```bash
+sudo firewall-cmd --zone=public --add-port=55555/tcp --permanent
+sudo firewall-cmd --reload
+```
 
-#Find nginx source files location.
+> Reference: [DigitalOcean firewalld Guide](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7)
+
+---
+
+## 🛠️ 11. Change Nginx Port
+
+### 🔍 Find Nginx Location
+```bash
 whereis nginx
+```
 
-1. Open NGINX configuration file
-# vi /etc/nginx/sites-enabled/default  [On Debian/Ubuntu]
-# vi /etc/nginx/nginx.conf             [On CentOS/RHEL]
+---
 
-2. Change NGINX port number
-#Look for the line that begins with listen inside server block. It will look something like
+### 📂 Edit Config File
+On Ubuntu/Debian:
+```bash
+sudo nano /etc/nginx/sites-enabled/default
+```
 
-server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        ...
-Change port number 80 to 8080 in above lines, to look like
+On CentOS/RHEL:
+```bash
+sudo nano /etc/nginx/nginx.conf
+```
 
-server {
-        listen 8080 default_server;
-        listen [::]:8080 default_server;
+---
 
-3. Check syntax of your updated config file.
+### ✏️ Change Listen Port
+From:
+```nginx
+listen 80 default_server;
+```
+To:
+```nginx
+listen 8080 default_server;
+```
+
+---
+
+### ✅ Test Config
+```bash
 nginx -t
+```
 
-4. Restart NGINX
-service nginx reload        [On Debian/Ubuntu]
-systemctl restart nginx     [On CentOS/RHEL]
+---
 
-#Verify local network sockets table
-netstat -tlpn| grep nginx
-ss -tlpn| grep nginx
+### 🔁 Restart Nginx
+On Ubuntu:
+```bash
+sudo service nginx reload
+```
 
-sudo docker run --name docker-nginx -p 80:80 -v ~/docker-nginx/html:/usr/share/nginx/html -v ~/docker-nginx/default.conf:/etc/nginx/conf.d/default.conf -d nginx
+On CentOS:
+```bash
+sudo systemctl restart nginx
+```
 
-+++++++++++++++++++ End Change Nginx Port +++++++++++++++++++++++++++++++
+---
 
-++++++++++++++++++++++++++
-+ Install Docker Compose +
-++++++++++++++++++++++++++
-Reference:
-1. https://docs.docker.com/compose/install/linux/#install-the-plugin-manually
-2. https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-22-04
-++++++++++++++++++++++++++++++++++++++++++++++++++
+### 🔍 Verify Port
+```bash
+netstat -tlpn | grep nginx
+```
+or
+```bash
+ss -tlpn | grep nginx
+```
 
-++++++++++++++++++++++++++++
-+ Working with Dockerfile  +
-++++++++++++++++++++++++++++
+---
 
+## 🧩 12. Docker Compose (Install)
+
+### 📥 Install Docker Compose Manually
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+### 🔧 Make Executable
+```bash
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+### ✅ Test Installation
+```bash
+docker-compose --version
+```
+
+> Reference: [Docker Compose Install Guide](https://docs.docker.com/compose/install/linux/#install-the-plugin-manually)
+
+---
+
+## 🧱 13. Build Custom Images (Dockerfile)
+
+### 📁 Create Folder
+```bash
 mkdir dockerfile && cd dockerfile
+```
 
-#Create a file 
-#By default Docker file name is Dockerfile.
+---
 
+### 📄 Create Dockerfile
+```bash
 nano Dockerfile
+```
 
-# Write a dockerfile
-
-FROM nginx:alpine
-
-#How to build docker file from current location or default name. 
-# -t for tag or name, . for define current with default Dockerfile name.
-
-docker build -t imagename .
-
-#How to build docker file from another location or custome name.
-#docker build -t imagename -f [filepath] with [filename]
-
-docker build -t myimage -f /home/user/mydockerfile
-
-#Write a dockerfile
-
+Add:
+```Dockerfile
 FROM nginx:alpine
 COPY index.html /usr/share/nginx/html/index.html
+```
 
-#Create a index.html file in current location.
+---
 
-nano index.html
+### 📄 Create index.html
+```bash
+echo "<h1>Hello from Docker!</h1>" > index.html
+```
 
-# Dockerfile Instruction
+---
 
-FROM : Using for Pulling Base image
-ADD : Using for copy & untar file don't zip to unzip and can download from url link.
-COPY : Using for only copy file 
-WORKDIR :  Define landing directory in container execution.
-WORKDIR /usr/share/nginx/html
+### 🛠️ Build Image
+```bash
+docker build -t mywebapp .
+```
 
-ENV: Define environment variable
-ENV PWD /usr/share/nginx/html
+> `-t` = tag name, `.` = current directory.
 
-#Declear ENV Variable
-WORKDIR $PWD
+---
 
-RUN : Using for installation
-RUN apt-get update -y
-RUN apt-get install nginx -y
+### 🛠️ Build with Custom File Name/Path
+```bash
+docker build -t myimage -f /home/user/mydockerfile
+```
 
-#We can multiple installation single line using RUN with && .
+---
 
-RUN apt-get update && apt-get upgrade && apt-get install nginx -y
+### 🧱 Dockerfile Instructions
 
+| Command | Purpose |
+|--------|--------|
+| `FROM` | Base image (e.g., `ubuntu`, `nginx`) |
+| `COPY` | Copy files from host to container |
+| `ADD` | Like COPY, but can download URLs and extract `.tar` files |
+| `WORKDIR` | Set current directory inside container |
+| `ENV` | Set environment variable |
+| `RUN` | Run command during build |
+| `CMD` | Default command when container starts |
+| `EXPOSE` | Document which port to use |
+| `VOLUME` | Define shared data folder |
 
-#Example: dockerfile using ADD instruction
+---
 
-#create a folder to tar file
-#web is a folder name.
+### 📦 Example: Use ADD to Extract .tar
+Create tar file:
+```bash
+tar -cvf web.tar web/
+```
 
-tar -cvf web.tar web
-
-#Write a dockerfile using ADD instruction.
-
+Dockerfile:
+```Dockerfile
 FROM nginx:alpine
 ADD web.tar /usr/share/nginx/html/
+```
 
-+++++++++++++++++++++++++++++++++++++++
+---
 
-++++++++++++++++++++++++++++++++++++++++++++++
-+ Create a Docker Container with SSH access  +
-++++++++++++++++++++++++++++++++++++++++++++++
+## 🔐 14. SSH Access in Docker Container
 
-#Create a Dockerfile
-
+### 📄 Create Dockerfile for SSH
+```bash
 nano Dockerfile
+```
 
-#In that file, paste the following:
-
-####
-
+Paste:
+```Dockerfile
 FROM ubuntu:20.04
-
 RUN apt-get update && apt-get install -y openssh-server
-
 RUN echo 'root:ubuntu' | chpasswd
-
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
-RUN service ssh restart
-
 EXPOSE 22
-
 CMD ["/usr/sbin/sshd", "-D"]
+```
 
-####
+---
 
-#Build the Dockerfile
+### 🛠️ Build Image
+```bash
+docker build -t myubuntu-ssh .
+```
 
-docker build -t myubuntu .
+---
 
-#Run the container
+### ▶️ Run Container
+```bash
+docker run -d -P --name myssh myubuntu-ssh
+```
 
-docker run -d -P --name myubuntu myubuntu
+> `-P` assigns random port for SSH.
 
-#How to locate the IP address of the running container
+---
 
-docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' myubuntu
+### 🌐 Get Container IP
+```bash
+docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' myssh
+```
 
-#SSH Connection into the running container
+---
 
-#ssh root@containerIP or host IP
-
+### 🔐 SSH Into Container
+```bash
 ssh root@172.17.0.5
+```
 
-+++++++++++++++++++++++++++
+> Use the IP from above.
 
-++++++++++++++++++++++++++++++++++++++++++++++++++
-+ Configure Root User for  SSH in Ubuntu         +
-++++++++++++++++++++++++++++++++++++++++++++++++++
+---
 
-#Create or Change Root Password
+## 🔐 15. Enable Root SSH in Running Ubuntu Container
 
+### 🔐 Set Root Password
+```bash
 passwd root
-
-#OR
-
+```
+or
+```bash
 echo 'root:ubuntu' | chpasswd
+```
 
-#Permit login ssh as root
+---
 
+### 🔐 Allow Root Login
+```bash
 sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+```
 
-#OR
-
+Or edit manually:
+```bash
 nano /etc/ssh/sshd_config
-
-#find the line, comment out and yes
-#PermitRootLogin prohibit-password
-
-#Edit like bellow
+```
+Change:
+```
 PermitRootLogin yes
+```
 
-#Restart ssh service
+---
+
+### 🔁 Restart SSH
+```bash
 systemctl restart sshd
+```
 
-++++++++++++++++++++++++++++++++++++++++++++++++++
+---
+
+## 📦 16. Extra Useful Docker Commands
+
+### 📊 View Live Resource Usage
+```bash
+docker stats webserver
+```
+
+---
+
+### ⏸️ Pause Container
+```bash
+docker pause webserver
+```
+
+---
+
+### ▶️ Resume Container
+```bash
+docker unpause webserver
+```
+
+---
+
+### 📁 Copy File from Container to Host
+```bash
+docker cp webserver1:/usr/share/nginx/html/index.html /home/user/
+```
+
+---
+
+### 📁 Copy File from Host to Container
+```bash
+docker cp index.html webserver1:/usr/share/nginx/html/index.html
+```
+
+---
+
+### 📜 View Image Build History
+```bash
+docker history httpd
+```
+
+---
+
+### 📜 View Container Logs
+```bash
+docker logs 09ca6feb6efc
+```
+
+---
+
+### 🛠️ Update Container Settings
+```bash
+docker update --help
+```
+
+Example: Change CPU shares
+```bash
+docker update -c 1 2f6fb3381078
+```
+
+---
+
+## ✅ Final Notes
+
+- Always use meaningful names for containers and images.
+- Use `--rm` for test containers to auto-clean.
+- Use volumes (`-v`) to save data.
+- Use `docker exec` instead of SSH when possible.
+- Use `Dockerfile` + `docker build` for repeatable setups.
+- Use `docker-compose` for multi-container apps.
+
+---
