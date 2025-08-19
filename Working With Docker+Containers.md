@@ -993,3 +993,422 @@ docker update -c 1 2f6fb3381078
 - Use `docker-compose` for multi-container apps.
 
 ---
+
+## 🔧 **Additional Docker Commands & Best Practices**
+
+### 📂 17. Use `.dockerignore` File (Like `.gitignore`)
+Prevent unwanted files from being copied into the image.
+
+```bash
+# Create .dockerignore
+nano .dockerignore
+```
+
+Add:
+```
+# Ignore node modules
+node_modules/
+
+# Ignore logs
+*.log
+
+# Ignore environment files
+.env
+
+# Ignore IDE files
+.DS_Store
+.vscode/
+.idea/
+```
+
+> ✅ Best Practice: Always use `.dockerignore` when building images.
+
+---
+
+### 🛠️ 18. Build Image with Build Arguments (`ARG`)
+Pass values at build time.
+
+```Dockerfile
+# In Dockerfile
+ARG APP_ENV=development
+ENV APP_ENV=$APP_ENV
+
+RUN echo "Building for $APP_ENV environment"
+```
+
+Build with argument:
+```bash
+docker build --build-arg APP_ENV=production -t myapp:prod .
+```
+
+---
+
+### 🧱 19. Multi-Stage Builds (Reduce Image Size)
+Use one stage to build, another to run.
+
+```Dockerfile
+# Stage 1: Build
+FROM node:16 AS builder
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+# Stage 2: Run
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+Build:
+```bash
+docker build -t mywebapp .
+```
+
+> ✅ Result: Small final image, no Node.js or build tools included.
+
+---
+
+### 🔄 20. Restart Policies (Auto-Start Containers)
+Make containers restart automatically.
+
+```bash
+# Always restart
+docker run -d --restart=always --name web nginx
+
+# Restart only on failure
+docker run -d --restart=on-failure:3 --name web nginx
+
+# No restart (default)
+docker run -d --restart=no --name web nginx
+```
+
+> Useful for production services.
+
+---
+
+### 📁 21. Named Volumes (Better than Bind Mounts)
+Let Docker manage storage.
+
+```bash
+# Create a named volume
+docker volume create app-data
+
+# Use in container
+docker run -d -v app-data:/var/lib/mysql --name mysql mysql
+```
+
+List volumes:
+```bash
+docker volume ls
+```
+
+Inspect:
+```bash
+docker volume inspect app-data
+```
+
+Remove unused:
+```bash
+docker volume prune
+```
+
+> ✅ Best Practice: Use named volumes for databases.
+
+---
+
+### 🌐 22. Custom Network with Subnet & Gateway
+Create advanced networks.
+
+```bash
+docker network create \
+  --driver bridge \
+  --subnet=192.168.100.0/24 \
+  --gateway=192.168.100.1 \
+  mynetwork
+```
+
+Run container on it:
+```bash
+docker run -it --network=mynetwork ubuntu /bin/bash
+```
+
+---
+
+### 🧯 23. Clean Up Everything (Full Reset)
+Remove **all** unused objects at once.
+
+```bash
+docker system prune -a --volumes
+```
+
+> ⚠️ Warning: Removes all unused containers, images, networks, **and volumes**.
+
+Use safely:
+```bash
+docker system prune        # Only unused stuff
+docker system prune -a     # Also removes unused images
+```
+
+---
+
+### 📊 24. View Real-Time Logs
+Follow logs like `tail -f`.
+
+```bash
+docker logs -f webserver
+```
+
+Show last 50 lines:
+```bash
+docker logs --tail 50 webserver
+```
+
+---
+
+### 🐍 25. Run Python App in Container
+Quick way to test a Python script.
+
+```bash
+# Run Python 3 and enter shell
+docker run -it python:3.9 /bin/bash
+
+# Run a Python script directly
+echo 'print("Hello from Docker!")' > hello.py
+docker run -v $(pwd):/app -w /app python:3.9 python hello.py
+```
+
+> `-w /app` sets working directory.
+
+---
+
+### 📦 26. Export & Import Images (No Docker Hub)
+Save image as file and share.
+
+```bash
+# Save image to tar file
+docker save -o myimage.tar mywebapp:latest
+
+# Load image on another machine
+docker load -i myimage.tar
+```
+
+> Useful for offline environments.
+
+---
+
+### 🚚 27. Export & Import Containers
+Save container state as image.
+
+```bash
+# Export stopped container
+docker export web1 > web1-container.tar
+
+# Import as image
+cat web1-container.tar | docker import - web1-restored:latest
+```
+
+> Note: `export` removes history; use `commit` for full image.
+
+---
+
+### 🔐 28. Run Container as Non-Root User
+More secure.
+
+```Dockerfile
+FROM ubuntu:20.04
+RUN useradd -m myuser
+USER myuser
+CMD ["sleep", "3600"]
+```
+
+Or at runtime:
+```bash
+docker run -it --user 1000 ubuntu /bin/bash
+```
+
+> ✅ Best Practice: Avoid running as root in production.
+
+---
+
+### 🧩 29. Docker Compose – Advanced Example
+Create `docker-compose.yml`:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    depends_on:
+      - app
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: myapp
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:
+```
+
+Run:
+```bash
+docker-compose up -d
+```
+
+Stop:
+```bash
+docker-compose down
+```
+
+---
+
+### 🧪 30. Run Tests in Container
+Run one-time command for testing.
+
+```bash
+docker run --rm ubuntu bash -c "apt-get update && echo 'Test Passed'"
+```
+
+> `--rm` ensures cleanup after test.
+
+---
+
+### 📁 31. Check Disk Usage
+See how much space Docker is using.
+
+```bash
+docker system df
+```
+
+Output:
+```
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          5         3         1.2GB     800MB (66%)
+Containers      10        2         300MB     250MB (83%)
+Local Volumes   3         1         500MB     400MB (80%)
+Build Cache     -         -         200MB     200MB
+```
+
+---
+
+### 🧰 32. Inspect Any Object (Container, Image, Network, Volume)
+Get detailed JSON info.
+
+```bash
+docker inspect webserver
+docker inspect nginx
+docker inspect bridge
+docker inspect app-data
+```
+
+Filter specific field:
+```bash
+docker inspect webserver --format='{{.NetworkSettings.IPAddress}}'
+```
+
+---
+
+### 🧹 33. Remove All Unused Objects (Safe Cleanup)
+```bash
+docker system prune
+```
+
+Interactive prompt will ask:
+```
+WARNING! This will remove:
+  - all stopped containers
+  - all networks not used by at least one container
+  - all dangling images
+  - all build cache
+
+Are you sure? [y/N]
+```
+
+Add `-f` to skip prompt:
+```bash
+docker system prune -f
+```
+
+---
+
+### 📂 34. Mount Read-Only Volume
+Prevent changes from container.
+
+```bash
+docker run -v ~/config:/app/config:ro nginx
+```
+
+> `:ro` = read-only. Useful for config files.
+
+---
+
+### 🧯 35. Stop & Remove Container in One Command
+```bash
+docker stop webserver && docker rm webserver
+```
+
+Or use `--rm` when running:
+```bash
+docker run --rm -it ubuntu /bin/bash
+```
+
+---
+
+### 🧭 36. List All Container IDs Only
+Useful for scripts.
+
+```bash
+docker ps -aq
+```
+
+Stop and remove all:
+```bash
+docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
+```
+
+---
+
+## ✅ **Best Practices Summary (Updated)**
+
+| Practice | Why It's Important |
+|--------|-------------------|
+| ✅ Use `--rm` for test containers | Auto cleanup |
+| ✅ Use named volumes for data | Better management |
+| ✅ Use `.dockerignore` | Faster builds |
+| ✅ Use multi-stage builds | Smaller images |
+| ✅ Avoid `latest` tag | Predictable deployments |
+| ✅ Use `docker-compose.yml` | Manage multi-container apps |
+| ✅ Run as non-root user | Security |
+| ✅ Use `restart: unless-stopped` | Auto-healing |
+| ✅ Clean up with `prune` | Save disk space |
+| ✅ Use `EXPOSE` and `CMD` | Clear image metadata |
+
+---
+
+## 📚 Final Tips
+
+- Always name your containers (`--name`).
+- Use tags: `myapp:v1`, `myapp:prod`, not just `myapp`.
+- Never store secrets in Dockerfiles.
+- Use `docker logs`, `docker stats`, `docker inspect` daily.
+- Learn `docker-compose` — it's essential for real apps.
+- Keep your base images updated (e.g., `alpine`, `ubuntu:22.04`).
+
+---
+
+
